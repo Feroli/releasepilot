@@ -34,6 +34,15 @@ public final class PromotionReadModels {
     ) {
     }
 
+    public record PagedResponse<T>(
+            List<T> content,
+            int page,
+            int size,
+            long totalElements,
+            int totalPages
+    ) {
+    }
+
     public record PromotionHistoryItem(
             UUID eventId,
             String eventType,

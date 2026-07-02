@@ -16,6 +16,7 @@ import com.releasepilot.promotion.application.query.PromotionReadModels.Promotio
 import com.releasepilot.promotion.domain.Environment;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,8 +96,8 @@ public class PromotionCommandController {
     public record RequestPromotionRequest(
             @NotBlank String applicationId,
             @NotBlank String version,
-            Environment sourceEnvironment,
-            Environment targetEnvironment,
+            @NotNull Environment sourceEnvironment,
+            @NotNull Environment targetEnvironment,
             @NotBlank String requestedBy
     ) {
     }

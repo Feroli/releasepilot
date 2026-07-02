@@ -69,7 +69,12 @@ public class PromotionCommandSupport {
                 applicationId,
                 target,
                 ACTIVE_STATUSES);
-        return new PromotionEligibility(sourceCompleted, activeExists);
+        boolean targetCompleted = statusRepository.existsByApplicationIdAndVersionIdAndEnvironmentAndState(
+                applicationId,
+                versionId,
+                target,
+                EnvironmentState.COMPLETED);
+        return new PromotionEligibility(sourceCompleted, activeExists, targetCompleted);
     }
 
     public Promotion saveAndRecord(Promotion promotion) {

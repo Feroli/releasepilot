@@ -34,7 +34,7 @@ class PromotionTest {
                 Environment.STAGING,
                 Environment.PRODUCTION,
                 "requester",
-                new PromotionEligibility(true, false),
+                new PromotionEligibility(true, false, false),
                 NOW);
 
         assertThat(promotion.status()).isEqualTo(PromotionStatus.REQUESTED);
@@ -58,7 +58,7 @@ class PromotionTest {
                         Environment.DEV,
                         Environment.STAGING,
                         "requester",
-                        new PromotionEligibility(false, false),
+                        new PromotionEligibility(false, false, false),
                         NOW),
                 DomainErrorCode.PREVIOUS_ENVIRONMENT_INCOMPLETE);
     }
@@ -74,7 +74,7 @@ class PromotionTest {
                         Environment.DEV,
                         Environment.STAGING,
                         "requester",
-                        new PromotionEligibility(true, true),
+                        new PromotionEligibility(true, true, false),
                         NOW),
                 DomainErrorCode.PROMOTION_ALREADY_IN_PROGRESS);
     }
@@ -124,7 +124,7 @@ class PromotionTest {
         assertThat(promotion.status()).isEqualTo(PromotionStatus.COMPLETED);
         assertThat(promotion.terminalAt()).isEqualTo(NOW.plusSeconds(3));
         assertDomainError(
-                () -> promotion.cancel("release-manager", "too late", NOW.plusSeconds(4)),
+                () -> promotion.cancel("release-manager", true, "too late", NOW.plusSeconds(4)),
                 DomainErrorCode.PROMOTION_IMMUTABLE);
     }
 
@@ -132,7 +132,7 @@ class PromotionTest {
     void rollsBackApprovedPromotion() {
         Promotion promotion = approvedPromotion();
 
-        promotion.rollBack("release-manager", "failed checks", NOW.plusSeconds(2));
+        promotion.rollBack("release-manager", true, "failed checks", NOW.plusSeconds(2));
 
         assertThat(promotion.status()).isEqualTo(PromotionStatus.ROLLED_BACK);
         assertThat(promotion.pullRecordedEvents())
@@ -145,7 +145,7 @@ class PromotionTest {
         Promotion promotion = request(Environment.DEV, Environment.STAGING);
         promotion.pullRecordedEvents();
 
-        promotion.cancel("requester", "superseded", NOW.plusSeconds(1));
+        promotion.cancel("requester", true, "superseded", NOW.plusSeconds(1));
 
         assertThat(promotion.status()).isEqualTo(PromotionStatus.CANCELLED);
         assertDomainError(
@@ -162,7 +162,7 @@ class PromotionTest {
                 source,
                 target,
                 "requester",
-                new PromotionEligibility(true, false),
+                new PromotionEligibility(true, false, false),
                 NOW);
     }
 

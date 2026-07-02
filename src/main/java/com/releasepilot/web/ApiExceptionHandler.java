@@ -58,8 +58,9 @@ public class ApiExceptionHandler {
                     PREVIOUS_ENVIRONMENT_INCOMPLETE,
                     PROMOTION_ALREADY_IN_PROGRESS,
                     INVALID_PROMOTION_STATE,
+                    TARGET_ENVIRONMENT_ALREADY_COMPLETED,
                     PROMOTION_IMMUTABLE -> HttpStatus.CONFLICT;
-            case INVALID_ENVIRONMENT -> HttpStatus.BAD_REQUEST;
+            case INVALID_ENVIRONMENT, INVALID_PAGINATION -> HttpStatus.BAD_REQUEST;
         };
     }
 }

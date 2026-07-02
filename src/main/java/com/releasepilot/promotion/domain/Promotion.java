@@ -76,6 +76,11 @@ public class Promotion {
                     DomainErrorCode.PROMOTION_ALREADY_IN_PROGRESS,
                     "A promotion is already in progress for this application and target environment");
         }
+        if (eligibility.targetEnvironmentAlreadyCompleted()) {
+            throw new DomainException(
+                    DomainErrorCode.TARGET_ENVIRONMENT_ALREADY_COMPLETED,
+                    "This version has already completed the target environment");
+        }
         Promotion promotion = new Promotion(
                 id,
                 applicationId,
@@ -156,12 +161,15 @@ public class Promotion {
         record(PromotionDomainEvent.COMPLETED, actingUser, now, Map.of());
     }
 
-    public void rollBack(String actingUser, String reason, Instant now) {
+    public void rollBack(String actingUser, boolean approver, String reason, Instant now) {
         requireMutable();
         if (status != PromotionStatus.APPROVED && status != PromotionStatus.DEPLOYING) {
             throw new DomainException(
                     DomainErrorCode.INVALID_PROMOTION_STATE,
                     "Promotion can only be rolled back after approval and before completion");
+        }
+        if (!approver) {
+            throw new DomainException(DomainErrorCode.APPROVER_REQUIRED, "Only approvers may roll back promotions");
         }
         status = PromotionStatus.ROLLED_BACK;
         updatedAt = now;
@@ -169,8 +177,11 @@ public class Promotion {
         record(PromotionDomainEvent.ROLLED_BACK, actingUser, now, Map.of("reason", reason));
     }
 
-    public void cancel(String actingUser, String reason, Instant now) {
+    public void cancel(String actingUser, boolean approver, String reason, Instant now) {
         requireMutable();
+        if (!approver) {
+            throw new DomainException(DomainErrorCode.APPROVER_REQUIRED, "Only approvers may cancel promotions");
+        }
         status = PromotionStatus.CANCELLED;
         updatedAt = now;
         terminalAt = now;

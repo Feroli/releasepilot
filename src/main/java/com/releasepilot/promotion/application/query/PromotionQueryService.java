@@ -3,6 +3,7 @@ package com.releasepilot.promotion.application.query;
 import com.releasepilot.promotion.application.query.PromotionReadModels.ApplicationEnvironmentStatusResponse;
 import com.releasepilot.promotion.application.query.PromotionReadModels.AuditLogResponse;
 import com.releasepilot.promotion.application.query.PromotionReadModels.EnvironmentStatusItem;
+import com.releasepilot.promotion.application.query.PromotionReadModels.PagedResponse;
 import com.releasepilot.promotion.application.query.PromotionReadModels.PromotionDetailResponse;
 import com.releasepilot.promotion.application.query.PromotionReadModels.PromotionHistoryItem;
 import com.releasepilot.promotion.application.query.PromotionReadModels.PromotionResponse;
@@ -10,6 +11,7 @@ import com.releasepilot.promotion.application.query.PromotionReadModels.ReleaseN
 import com.releasepilot.promotion.domain.DomainErrorCode;
 import com.releasepilot.promotion.domain.DomainException;
 import com.releasepilot.promotion.domain.Environment;
+import com.releasepilot.promotion.infrastructure.persistence.repository.ApplicationJpaRepository;
 import com.releasepilot.promotion.infrastructure.persistence.repository.AuditLogJpaRepository;
 import com.releasepilot.promotion.infrastructure.persistence.repository.PromotionEventJpaRepository;
 import com.releasepilot.promotion.infrastructure.persistence.repository.PromotionJpaRepository;
@@ -34,18 +36,27 @@ public class PromotionQueryService {
     private final VersionEnvironmentStatusJpaRepository statusRepository;
     private final AuditLogJpaRepository auditLogRepository;
     private final ReleaseNoteDraftJpaRepository draftRepository;
+    private final ApplicationJpaRepository applicationRepository;
 
     public PromotionQueryService(
             PromotionJpaRepository promotionRepository,
             PromotionEventJpaRepository eventRepository,
             VersionEnvironmentStatusJpaRepository statusRepository,
             AuditLogJpaRepository auditLogRepository,
-            ReleaseNoteDraftJpaRepository draftRepository) {
+            ReleaseNoteDraftJpaRepository draftRepository,
+            ApplicationJpaRepository applicationRepository) {
         this.promotionRepository = promotionRepository;
         this.eventRepository = eventRepository;
         this.statusRepository = statusRepository;
         this.auditLogRepository = auditLogRepository;
         this.draftRepository = draftRepository;
+        this.applicationRepository = applicationRepository;
+    }
+
+    private void requireApplication(String applicationId) {
+        if (!applicationRepository.existsById(applicationId)) {
+            throw new DomainException(DomainErrorCode.RESOURCE_NOT_FOUND, "Application not found");
+        }
     }
 
     @Transactional(readOnly = true)
@@ -65,13 +76,21 @@ public class PromotionQueryService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PromotionResponse> getPromotionHistory(String applicationId, Pageable pageable) {
-        return promotionRepository.findByApplicationId(applicationId, pageable)
+    public PagedResponse<PromotionResponse> getPromotionHistory(String applicationId, Pageable pageable) {
+        requireApplication(applicationId);
+        Page<PromotionResponse> page = promotionRepository.findByApplicationId(applicationId, pageable)
                 .map(PromotionResponseMapper::from);
+        return new PagedResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages());
     }
 
     @Transactional(readOnly = true)
     public ApplicationEnvironmentStatusResponse getApplicationStatus(String applicationId) {
+        requireApplication(applicationId);
         Map<Environment, VersionEnvironmentStatusEntity> latestByEnvironment =
                 statusRepository.findByApplicationId(applicationId).stream()
                         .collect(Collectors.groupingBy(
