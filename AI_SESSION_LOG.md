@@ -10,5 +10,8 @@ This file records how AI assistance was used for the ReleasePilot challenge.
 - Created Mermaid diagrams for system context, hexagonal architecture, Promotion state machine, command flow, async event flow, persistence model, CQRS, and optional release-notes agent.
 - Created local implementation planning artifacts.
 - Added local closure planning for a generated motion video walkthrough for challenge delivery item `04 Walk us through it`.
+- Created the public GitHub repository.
+- Started implementation by scaffolding the Spring Boot runtime, Docker Compose dependencies, Flyway baseline schema, and a context smoke test.
+- Verified the foundation with `./gradlew test`, `./gradlew clean build`, and `docker compose config`.
 
 Decisions are reviewed and accepted by the repository owner before final submission.

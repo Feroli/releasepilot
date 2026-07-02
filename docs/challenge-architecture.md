@@ -22,7 +22,7 @@ The architecture should demonstrate senior backend judgment more than feature vo
 
 | Concern | Choice | Rationale |
 | --- | --- | --- |
-| Language | Java 21 | Modern Java, records, sealed types if useful, strong interview fit |
+| Language | Java 17 | LTS Java baseline that runs on the local development environment |
 | Framework | Spring Boot 3 | Fast REST, validation, Problem Details, Actuator, messaging integration |
 | Build | Gradle | Common Java challenge setup |
 | Database | PostgreSQL | Transactional constraints and realistic persistence |

@@ -290,4 +290,3 @@ Suggested criteria:
 - Queue-backed audit logging works asynchronously.
 - The README and walkthrough explain trade-offs honestly.
 - Optional stretch work is attempted only after the core engine is solid.
-
