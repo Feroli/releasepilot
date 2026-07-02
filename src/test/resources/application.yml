@@ -8,7 +8,7 @@ spring:
     enabled: false
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
     open-in-view: false
   rabbitmq:
     listener:
@@ -17,3 +17,6 @@ spring:
       direct:
         auto-startup: false
 
+releasepilot:
+  outbox:
+    enabled: false

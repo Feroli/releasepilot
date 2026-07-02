@@ -1,0 +1,217 @@
+{
+  "info": {
+    "_postman_id": "d24ba080-e2a3-42a4-b8a4-cc9f8bd08bbf",
+    "name": "ReleasePilot Complete Workflow",
+    "description": "Manual workflow for the ReleasePilot challenge: setup, promotion lifecycle, read models, async audit/release notes, and negative cases.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 Create application",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"payments-api\",\n  \"name\": \"Payments API\"\n}"
+        },
+        "url": "{{baseUrl}}/applications"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('created or already exists', function () {", "  pm.expect([201, 409]).to.include(pm.response.code);", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "02 Register version with dev completed",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"version\": \"1.4.0\",\n  \"devCompleted\": true\n}"
+        },
+        "url": "{{baseUrl}}/applications/payments-api/versions"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('created or already exists', function () {", "  pm.expect([201, 409]).to.include(pm.response.code);", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "03 Request DEV to STAGING promotion",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"applicationId\": \"payments-api\",\n  \"version\": \"1.4.0\",\n  \"sourceEnvironment\": \"DEV\",\n  \"targetEnvironment\": \"STAGING\",\n  \"requestedBy\": \"fernando\"\n}"
+        },
+        "url": "{{baseUrl}}/promotions"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('promotion requested', function () {",
+            "  pm.response.to.have.status(201);",
+            "  const body = pm.response.json();",
+            "  pm.expect(body.status).to.equal('REQUESTED');",
+            "  pm.environment.set('promotionId', body.id);",
+            "});"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "04 Approve promotion",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"actingUser\": \"release-manager\"\n}"},
+        "url": "{{baseUrl}}/promotions/{{promotionId}}/approve"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('promotion approved', function () {", "  pm.response.to.have.status(200);", "  pm.expect(pm.response.json().status).to.equal('APPROVED');", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "05 Start deployment",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"actingUser\": \"release-manager\"\n}"},
+        "url": "{{baseUrl}}/promotions/{{promotionId}}/deployments"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('deployment started', function () {", "  pm.response.to.have.status(200);", "  const body = pm.response.json();", "  pm.expect(body.status).to.equal('DEPLOYING');", "  pm.expect(body.deploymentRef).to.be.a('string');", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "06 Complete promotion",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"actingUser\": \"release-manager\"\n}"},
+        "url": "{{baseUrl}}/promotions/{{promotionId}}/complete"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('promotion completed', function () {", "  pm.response.to.have.status(200);", "  pm.expect(pm.response.json().status).to.equal('COMPLETED');", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "07 Get promotion detail",
+      "request": {"method": "GET", "url": "{{baseUrl}}/promotions/{{promotionId}}"},
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('detail includes history', function () {", "  pm.response.to.have.status(200);", "  const body = pm.response.json();", "  pm.expect(body.promotion.status).to.equal('COMPLETED');", "  pm.expect(body.history.length).to.equal(4);", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "08 Get application status",
+      "request": {"method": "GET", "url": "{{baseUrl}}/applications/payments-api/status"},
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('staging is completed', function () {", "  pm.response.to.have.status(200);", "  const staging = pm.response.json().environments.find(env => env.environment === 'STAGING');", "  pm.expect(staging.state).to.equal('COMPLETED');", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "09 Get promotion history",
+      "request": {"method": "GET", "url": "{{baseUrl}}/applications/payments-api/promotions?page=0&size=10"},
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('history includes promotion', function () {", "  pm.response.to.have.status(200);", "  pm.expect(pm.response.json().content.length).to.be.greaterThan(0);", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "10 Wait for async consumers",
+      "event": [{
+        "listen": "prerequest",
+        "script": {"exec": ["setTimeout(function () {}, 2000);"], "type": "text/javascript"}
+      }],
+      "request": {"method": "GET", "url": "{{baseUrl}}/actuator/health"}
+    },
+    {
+      "name": "11 Get async audit log",
+      "request": {"method": "GET", "url": "{{baseUrl}}/promotions/{{promotionId}}/audit-log"},
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('audit log eventually has workflow events', function () {", "  pm.response.to.have.status(200);", "  pm.expect(pm.response.json().length).to.be.at.least(4);", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "12 Get release notes",
+      "request": {"method": "GET", "url": "{{baseUrl}}/promotions/{{promotionId}}/release-notes"},
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('release notes endpoint is available', function () {", "  pm.response.to.have.status(200);", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "13 Negative: environment skip is rejected",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"applicationId\": \"payments-api\",\n  \"version\": \"1.4.0\",\n  \"sourceEnvironment\": \"DEV\",\n  \"targetEnvironment\": \"PRODUCTION\",\n  \"requestedBy\": \"fernando\"\n}"
+        },
+        "url": "{{baseUrl}}/promotions"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('skip rejected', function () {", "  pm.response.to.have.status(409);", "  pm.expect(pm.response.json().title).to.equal('ENVIRONMENT_SKIPPED');", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "14 Request STAGING to PRODUCTION promotion",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"applicationId\": \"payments-api\",\n  \"version\": \"1.4.0\",\n  \"sourceEnvironment\": \"STAGING\",\n  \"targetEnvironment\": \"PRODUCTION\",\n  \"requestedBy\": \"fernando\"\n}"
+        },
+        "url": "{{baseUrl}}/promotions"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('production promotion requested', function () {", "  pm.response.to.have.status(201);", "  const body = pm.response.json();", "  pm.environment.set('productionPromotionId', body.id);", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "15 Negative: non approver cannot approve",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"actingUser\": \"developer\"\n}"},
+        "url": "{{baseUrl}}/promotions/{{productionPromotionId}}/approve"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('non approver rejected', function () {", "  pm.response.to.have.status(403);", "  pm.expect(pm.response.json().title).to.equal('APPROVER_REQUIRED');", "});"], "type": "text/javascript"}
+      }]
+    },
+    {
+      "name": "16 Negative: duplicate active target rejected",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"applicationId\": \"payments-api\",\n  \"version\": \"1.4.0\",\n  \"sourceEnvironment\": \"STAGING\",\n  \"targetEnvironment\": \"PRODUCTION\",\n  \"requestedBy\": \"fernando\"\n}"
+        },
+        "url": "{{baseUrl}}/promotions"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {"exec": ["pm.test('duplicate active promotion rejected', function () {", "  pm.response.to.have.status(409);", "  pm.expect(pm.response.json().title).to.equal('PROMOTION_ALREADY_IN_PROGRESS');", "});"], "type": "text/javascript"}
+      }]
+    }
+  ]
+}
+

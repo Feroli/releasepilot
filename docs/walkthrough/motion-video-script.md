@@ -1,6 +1,6 @@
 # ReleasePilot Walkthrough Motion Video Script
 
-This draft script will be tightened after implementation so the final walkthrough reflects the actual code.
+This script maps to the generated motion video in `deliverables/walkthrough/releasepilot-walkthrough.mp4`.
 
 ## Opening
 
