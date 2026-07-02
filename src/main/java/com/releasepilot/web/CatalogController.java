@@ -2,8 +2,8 @@ package com.releasepilot.web;
 
 import com.releasepilot.catalog.application.CatalogService;
 import com.releasepilot.promotion.domain.Environment;
-import com.releasepilot.promotion.infrastructure.persistence.ApplicationEntity;
-import com.releasepilot.promotion.infrastructure.persistence.ApplicationVersionEntity;
+import com.releasepilot.promotion.infrastructure.persistence.entity.ApplicationEntity;
+import com.releasepilot.promotion.infrastructure.persistence.entity.ApplicationVersionEntity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;

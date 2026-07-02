@@ -5,8 +5,8 @@ import com.releasepilot.promotion.application.port.DeploymentPort;
 import com.releasepilot.promotion.application.query.PromotionReadModels.PromotionResponse;
 import com.releasepilot.promotion.application.query.PromotionResponseMapper;
 import com.releasepilot.promotion.domain.Promotion;
-import com.releasepilot.promotion.infrastructure.persistence.EnvironmentState;
-import com.releasepilot.promotion.infrastructure.persistence.PromotionEntity;
+import com.releasepilot.promotion.infrastructure.persistence.entity.EnvironmentState;
+import com.releasepilot.promotion.infrastructure.persistence.entity.PromotionEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

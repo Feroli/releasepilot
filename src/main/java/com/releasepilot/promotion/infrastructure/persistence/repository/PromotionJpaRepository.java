@@ -1,7 +1,8 @@
-package com.releasepilot.promotion.infrastructure.persistence;
+package com.releasepilot.promotion.infrastructure.persistence.repository;
 
 import com.releasepilot.promotion.domain.Environment;
 import com.releasepilot.promotion.domain.PromotionStatus;
+import com.releasepilot.promotion.infrastructure.persistence.entity.PromotionEntity;
 import java.util.Collection;
 import java.util.UUID;
 import org.springframework.data.domain.Page;

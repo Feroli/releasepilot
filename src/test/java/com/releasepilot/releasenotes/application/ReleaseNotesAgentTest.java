@@ -7,7 +7,7 @@ import com.releasepilot.promotion.application.port.IssueTrackerPort;
 import com.releasepilot.promotion.application.port.WorkItem;
 import com.releasepilot.promotion.domain.Environment;
 import com.releasepilot.promotion.domain.PromotionDomainEvent;
-import com.releasepilot.promotion.infrastructure.persistence.ReleaseNoteDraftJpaRepository;
+import com.releasepilot.promotion.infrastructure.persistence.repository.ReleaseNoteDraftJpaRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;

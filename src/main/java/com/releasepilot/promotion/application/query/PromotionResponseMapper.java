@@ -1,7 +1,7 @@
 package com.releasepilot.promotion.application.query;
 
 import com.releasepilot.promotion.application.query.PromotionReadModels.PromotionResponse;
-import com.releasepilot.promotion.infrastructure.persistence.PromotionEntity;
+import com.releasepilot.promotion.infrastructure.persistence.entity.PromotionEntity;
 
 public final class PromotionResponseMapper {
     private PromotionResponseMapper() {

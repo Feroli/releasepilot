@@ -1,5 +1,6 @@
-package com.releasepilot.promotion.infrastructure.persistence;
+package com.releasepilot.promotion.infrastructure.persistence.repository;
 
+import com.releasepilot.promotion.infrastructure.persistence.entity.ApplicationVersionEntity;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

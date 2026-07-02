@@ -2,8 +2,8 @@ package com.releasepilot.promotion.infrastructure.messaging;
 
 import com.releasepilot.promotion.application.event.EventEnvelope;
 import com.releasepilot.promotion.application.event.EventJson;
-import com.releasepilot.promotion.infrastructure.persistence.AuditLogEntity;
-import com.releasepilot.promotion.infrastructure.persistence.AuditLogJpaRepository;
+import com.releasepilot.promotion.infrastructure.persistence.entity.AuditLogEntity;
+import com.releasepilot.promotion.infrastructure.persistence.repository.AuditLogJpaRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;

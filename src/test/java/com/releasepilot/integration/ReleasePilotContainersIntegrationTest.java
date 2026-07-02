@@ -6,9 +6,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.releasepilot.promotion.infrastructure.persistence.AuditLogJpaRepository;
+import com.releasepilot.promotion.infrastructure.persistence.repository.AuditLogJpaRepository;
 import com.releasepilot.promotion.infrastructure.messaging.OutboxPublisher;
-import com.releasepilot.promotion.infrastructure.persistence.ReleaseNoteDraftJpaRepository;
+import com.releasepilot.promotion.infrastructure.persistence.repository.ReleaseNoteDraftJpaRepository;
 import java.time.Duration;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

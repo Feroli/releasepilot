@@ -1,10 +1,10 @@
 package com.releasepilot.promotion.application.event;
 
 import com.releasepilot.promotion.domain.PromotionDomainEvent;
-import com.releasepilot.promotion.infrastructure.persistence.OutboxEventEntity;
-import com.releasepilot.promotion.infrastructure.persistence.OutboxEventJpaRepository;
-import com.releasepilot.promotion.infrastructure.persistence.PromotionEventEntity;
-import com.releasepilot.promotion.infrastructure.persistence.PromotionEventJpaRepository;
+import com.releasepilot.promotion.infrastructure.persistence.entity.OutboxEventEntity;
+import com.releasepilot.promotion.infrastructure.persistence.repository.OutboxEventJpaRepository;
+import com.releasepilot.promotion.infrastructure.persistence.entity.PromotionEventEntity;
+import com.releasepilot.promotion.infrastructure.persistence.repository.PromotionEventJpaRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 

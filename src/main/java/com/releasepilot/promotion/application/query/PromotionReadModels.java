@@ -2,7 +2,7 @@ package com.releasepilot.promotion.application.query;
 
 import com.releasepilot.promotion.domain.Environment;
 import com.releasepilot.promotion.domain.PromotionStatus;
-import com.releasepilot.promotion.infrastructure.persistence.EnvironmentState;
+import com.releasepilot.promotion.infrastructure.persistence.entity.EnvironmentState;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;

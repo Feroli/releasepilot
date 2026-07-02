@@ -1,4 +1,4 @@
-package com.releasepilot.promotion.infrastructure.persistence;
+package com.releasepilot.promotion.infrastructure.persistence.entity;
 
 public enum EnvironmentState {
     COMPLETED,

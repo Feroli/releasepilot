@@ -8,9 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.releasepilot.promotion.application.event.EventJson;
 import com.releasepilot.promotion.infrastructure.messaging.AuditLogConsumer;
-import com.releasepilot.promotion.infrastructure.persistence.AuditLogJpaRepository;
-import com.releasepilot.promotion.infrastructure.persistence.OutboxEventJpaRepository;
-import com.releasepilot.promotion.infrastructure.persistence.PromotionEventJpaRepository;
+import com.releasepilot.promotion.infrastructure.persistence.repository.AuditLogJpaRepository;
+import com.releasepilot.promotion.infrastructure.persistence.repository.OutboxEventJpaRepository;
+import com.releasepilot.promotion.infrastructure.persistence.repository.PromotionEventJpaRepository;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

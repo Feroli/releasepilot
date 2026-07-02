@@ -1,7 +1,7 @@
 package com.releasepilot.promotion.infrastructure.messaging;
 
-import com.releasepilot.promotion.infrastructure.persistence.OutboxEventEntity;
-import com.releasepilot.promotion.infrastructure.persistence.OutboxEventJpaRepository;
+import com.releasepilot.promotion.infrastructure.persistence.entity.OutboxEventEntity;
+import com.releasepilot.promotion.infrastructure.persistence.repository.OutboxEventJpaRepository;
 import java.time.Clock;
 import java.time.Instant;
 import org.slf4j.Logger;

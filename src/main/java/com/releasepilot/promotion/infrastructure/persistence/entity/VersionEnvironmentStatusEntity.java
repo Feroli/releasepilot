@@ -1,4 +1,4 @@
-package com.releasepilot.promotion.infrastructure.persistence;
+package com.releasepilot.promotion.infrastructure.persistence.entity;
 
 import com.releasepilot.promotion.domain.Environment;
 import jakarta.persistence.Entity;
