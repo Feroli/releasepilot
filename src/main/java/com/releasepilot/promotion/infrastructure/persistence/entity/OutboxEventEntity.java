@@ -1,5 +1,6 @@
 package com.releasepilot.promotion.infrastructure.persistence.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -14,6 +15,7 @@ public class OutboxEventEntity {
     private String aggregateType;
     private UUID aggregateId;
     private String eventType;
+    @Column(length = 4000)
     private String payload;
     private Instant occurredAt;
     private Instant publishedAt;
