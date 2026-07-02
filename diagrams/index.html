@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ReleasePilot Architecture Diagrams</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f8fb;
+        --panel: #ffffff;
+        --text: #1f2937;
+        --muted: #667085;
+        --line: #d9dee8;
+        --brand: #175cd3;
+        --brand-bg: #e7f0ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 248, 251, 0.92);
+        backdrop-filter: blur(12px);
+      }
+
+      .top {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 20px 28px 14px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 720;
+        letter-spacing: 0;
+      }
+
+      .subtitle {
+        margin: 4px 0 14px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      nav {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+      }
+
+      nav a {
+        flex: 0 0 auto;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 7px 10px;
+        color: var(--text);
+        background: var(--panel);
+        font-size: 13px;
+        text-decoration: none;
+      }
+
+      nav a:hover {
+        border-color: var(--brand);
+        color: var(--brand);
+        background: var(--brand-bg);
+      }
+
+      main {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 24px 28px 48px;
+      }
+
+      section {
+        margin: 0 0 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+      }
+
+      .section-head {
+        border-bottom: 1px solid var(--line);
+        padding: 16px 18px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: 0;
+      }
+
+      .note {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .diagram-wrap {
+        overflow: auto;
+        padding: 18px;
+      }
+
+      .mermaid {
+        min-width: 680px;
+      }
+
+      @media (max-width: 720px) {
+        .top,
+        main {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        h1 {
+          font-size: 21px;
+        }
+
+        .mermaid {
+          min-width: 760px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="top">
+        <h1>ReleasePilot Architecture Diagrams</h1>
+        <p class="subtitle">Mermaid views extracted from the challenge architecture doc.</p>
+        <nav aria-label="Diagram navigation">
+          <a href="#system-context">System Context</a>
+          <a href="#hexagonal">Hexagonal Architecture</a>
+          <a href="#state-machine">State Machine</a>
+          <a href="#command-flow">Command Flow</a>
+          <a href="#async-flow">Async Event Flow</a>
+          <a href="#persistence">Persistence Model</a>
+          <a href="#cqrs">CQRS</a>
+          <a href="#agent">Release Notes Agent</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="system-context">
+        <div class="section-head">
+          <h2>System Context</h2>
+          <p class="note">External clients, API service, database, queue, stubs, and async consumers.</p>
+        </div>
+        <div class="diagram-wrap">
+          <pre class="mermaid">
+flowchart LR
+    Client[API Client or Reviewer] --> API[ReleasePilot REST API]
+    API --> DB[(PostgreSQL)]
+    Publisher[Outbox Publisher] --> DB
+    Publisher --> MQ[(RabbitMQ)]
+    API --> Deploy[DeploymentPort Stub]
+    API --> Issues[IssueTrackerPort Stub]
+    API --> Notify[NotificationPort Stub]
+    MQ --> Audit[Audit Log Consumer]
+    Audit --> DB
+    MQ --> Agent[Optional Release Notes Agent]
+    Agent --> DB
+    Agent --> Issues
+          </pre>
+        </div>
+      </section>
+
+      <section id="hexagonal">
+        <div class="section-head">
+          <h2>Hexagonal Architecture</h2>
+          <p class="note">Domain and application core separated from inbound and infrastructure adapters.</p>
+        </div>
+        <div class="diagram-wrap">
+          <pre class="mermaid">
+flowchart TB
+    subgraph Inbound["Inbound Adapters"]
+        Rest[REST Controllers]
+        Consumer[Message Consumers]
+    end
+
+    subgraph Application["Application Layer"]
+        Cmd[Command Handlers]
+        Query[Query Handlers]
+        InPorts[Input Ports]
+        OutPorts[Output Ports]
+    end
+
+    subgraph Domain["Domain Layer"]
+        Promotion[Promotion Aggregate]
+        Pipeline[EnvironmentPipeline]
+        Policy[PromotionPolicy]
+        Errors[Domain Errors]
+        Events[Domain Events]
+    end
+
+    subgraph Infrastructure["Infrastructure Adapters"]
+        Jpa[JPA Repositories]
+        Amqp[RabbitMQ Publisher]
+        Outbox[Outbox Publisher]
+        StubDeploy[Deployment Stub]
+        StubIssues[Issue Tracker Stub]
+        StubNotify[Notification Stub]
+    end
+
+    Rest --> InPorts
+    Consumer --> InPorts
+    InPorts --> Cmd
+    InPorts --> Query
+    Cmd --> Promotion
+    Cmd --> Policy
+    Promotion --> Events
+    Query --> Jpa
+    OutPorts --> Jpa
+    OutPorts --> Amqp
+    OutPorts --> Outbox
+    OutPorts --> StubDeploy
+    OutPorts --> StubIssues
+    OutPorts --> StubNotify
+    Jpa --> DB[(PostgreSQL)]
+    Amqp --> MQ[(RabbitMQ)]
+    Outbox --> MQ
+          </pre>
+        </div>
+      </section>
+
+      <section id="state-machine">
+        <div class="section-head">
+          <h2>Promotion State Machine</h2>
+          <p class="note">Allowed lifecycle transitions for the Promotion aggregate.</p>
+        </div>
+        <div class="diagram-wrap">
+          <pre class="mermaid">
+stateDiagram-v2
+    [*] --> REQUESTED: RequestPromotion
+    REQUESTED --> APPROVED: ApprovePromotion
+    APPROVED --> DEPLOYING: StartDeployment
+    DEPLOYING --> COMPLETED: CompletePromotion
+
+    REQUESTED --> CANCELLED: CancelPromotion
+    APPROVED --> CANCELLED: CancelPromotion
+    DEPLOYING --> CANCELLED: CancelPromotion
+
+    APPROVED --> ROLLED_BACK: RollbackPromotion
+    DEPLOYING --> ROLLED_BACK: RollbackPromotion
+
+    COMPLETED --> [*]
+    CANCELLED --> [*]
+    ROLLED_BACK --> [*]
+          </pre>
+        </div>
+      </section>
+
+      <section id="command-flow">
+        <div class="section-head">
+          <h2>Command Processing Flow</h2>
+          <p class="note">Transactional command handling with aggregate persistence and outbox event creation.</p>
+        </div>
+        <div class="diagram-wrap">
+          <pre class="mermaid">
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant Handler as Command Handler
+    participant Policy as PromotionEligibilityPolicy
+    participant Repo as PromotionRepository
+    participant Aggregate as Promotion Aggregate
+    participant Outbox
+    participant Publisher as Outbox Publisher
+    participant Queue as RabbitMQ
+
+    Client->>Controller: POST /promotions
+    Controller->>Handler: RequestPromotion command
+    Handler->>Policy: check eligibility facts
+    Policy->>Repo: find active promotion and version status
+    Repo-->>Policy: eligibility snapshot
+    Handler->>Aggregate: Promotion.request(snapshot)
+    Aggregate-->>Handler: aggregate plus PromotionRequested
+    Handler->>Repo: save aggregate
+    Handler->>Outbox: save domain event
+    Handler-->>Controller: response DTO
+    Controller-->>Client: 201 Created
+    Publisher->>Outbox: poll unpublished events
+    Publisher->>Queue: publish event
+          </pre>
+        </div>
+      </section>
+
+      <section id="async-flow">
+        <div class="section-head">
+          <h2>Async Event Flow</h2>
+          <p class="note">API returns before queue consumers finish audit and notification work.</p>
+        </div>
+        <div class="diagram-wrap">
+          <pre class="mermaid">
+sequenceDiagram
+    participant Client
+    participant API as API Transaction
+    participant Outbox
+    participant Queue as RabbitMQ
+    participant Audit as AuditLogConsumer
+    participant DB as PostgreSQL
+    participant Notify as Notification Adapter
+
+    API->>Outbox: persist domain event
+    API-->>API: commit transaction
+    API-->>Client: HTTP response
+    Outbox->>Queue: publish after commit
+    Queue->>Audit: deliver event
+    Audit->>DB: insert audit_log entry
+    Queue->>Notify: terminal event delivery
+    Notify-->>Notify: send stub notification
+          </pre>
+        </div>
+      </section>
+
+      <section id="persistence">
+        <div class="section-head">
+          <h2>Persistence Model</h2>
+          <p class="note">PostgreSQL schema shape for catalog, promotions, events, audit, and optional drafts.</p>
+        </div>
+        <div class="diagram-wrap">
+          <pre class="mermaid">
+erDiagram
+    applications {
+        varchar id PK
+        varchar name
+        timestamptz created_at
+    }
+
+    application_versions {
+        varchar id PK
+        varchar application_id FK
+        varchar version
+        timestamptz created_at
+    }
+
+    version_environment_status {
+        varchar application_id FK
+        varchar version_id FK
+        varchar environment
+        varchar state
+        timestamptz completed_at
+    }
+
+    promotions {
+        uuid id PK
+        varchar application_id FK
+        varchar version_id FK
+        varchar source_environment
+        varchar target_environment
+        varchar status
+        varchar requested_by
+        varchar approved_by
+        varchar deployment_ref
+        timestamptz created_at
+        timestamptz updated_at
+        timestamptz terminal_at
+        integer aggregate_version
+    }
+
+    promotion_events {
+        uuid id PK
+        uuid promotion_id FK
+        varchar event_type
+        varchar acting_user
+        jsonb payload
+        timestamptz occurred_at
+    }
+
+    outbox_events {
+        uuid id PK
+        varchar aggregate_type
+        uuid aggregate_id
+        varchar event_type
+        jsonb payload
+        timestamptz occurred_at
+        timestamptz published_at
+    }
+
+    audit_log {
+        uuid id PK
+        uuid event_id
+        uuid promotion_id
+        varchar event_type
+        varchar acting_user
+        timestamptz occurred_at
+        timestamptz consumed_at
+    }
+
+    release_note_drafts {
+        uuid id PK
+        uuid promotion_id FK
+        text draft
+        varchar status
+        timestamptz created_at
+    }
+
+    applications ||--o{ application_versions : owns
+    application_versions ||--o{ promotions : promoted_by
+    application_versions ||--o{ version_environment_status : has
+    promotions ||--o{ promotion_events : records
+    promotions ||--o{ release_note_drafts : may_generate
+          </pre>
+        </div>
+      </section>
+
+      <section id="cqrs">
+        <div class="section-head">
+          <h2>CQRS Design</h2>
+          <p class="note">Separate command handlers and query handlers without requiring full event sourcing.</p>
+        </div>
+        <div class="diagram-wrap">
+          <pre class="mermaid">
+flowchart LR
+    subgraph WriteSide["Write Side"]
+        CommandDTO[Command DTO]
+        Handler[Command Handler]
+        Aggregate[Promotion Aggregate]
+        WriteRepo[Write Repository]
+    end
+
+    subgraph ReadSide["Read Side"]
+        Query[Query Handler]
+        ReadRepo[Read Repository]
+        ReadModel[Read Model DTO]
+    end
+
+    CommandDTO --> Handler --> Aggregate --> WriteRepo
+    Query --> ReadRepo --> ReadModel
+    WriteRepo --> DB[(PostgreSQL)]
+    ReadRepo --> DB
+          </pre>
+        </div>
+      </section>
+
+      <section id="agent">
+        <div class="section-head">
+          <h2>Optional Release Notes Agent</h2>
+          <p class="note">Tool-calling loop triggered from PromotionApproved.</p>
+        </div>
+        <div class="diagram-wrap">
+          <pre class="mermaid">
+flowchart TD
+    Approved[PromotionApproved Event] --> Agent[Release Notes Agent]
+    Agent --> GetWorkItems[Tool: GetWorkItems]
+    Agent --> Decide{Enough detail?}
+    Decide -->|No| Ask[Tool: AskClarification]
+    Decide -->|Breaking risk| Flag[Tool: FlagBreakingChange]
+    Decide -->|Ready| Submit[Tool: SubmitReleaseNotes]
+    GetWorkItems --> Issues[IssueTrackerPort Stub]
+    Ask --> DraftDB[(release_note_drafts)]
+    Flag --> DraftDB
+    Submit --> DraftDB
+          </pre>
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+      mermaid.initialize({
+        startOnLoad: true,
+        securityLevel: "strict",
+        theme: "base",
+        themeVariables: {
+          background: "#ffffff",
+          primaryColor: "#e7f0ff",
+          primaryTextColor: "#1f2937",
+          primaryBorderColor: "#175cd3",
+          lineColor: "#667085",
+          secondaryColor: "#f2f4f7",
+          tertiaryColor: "#ffffff",
+          fontFamily: "Inter, system-ui, sans-serif"
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+.gradle/
+build/
+out/
+.idea/
+.vscode/
+*.iml
+.DS_Store
+.env
+.env.*
+!/.env.example
+target/
+logs/
+tmp/
+
+# Local planning artifacts. Keep these out of the public challenge repository.
+docs/prds/
+docs/sprint/
