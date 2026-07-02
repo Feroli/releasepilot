@@ -7,6 +7,7 @@ ReleasePilot is a Java backend REST API for The Agile Monkeys technical challeng
 - [Acceptance Criteria](docs/acceptance-criteria.md)
 - [Challenge Architecture](docs/challenge-architecture.md)
 - [Walkthrough Motion Video Storyboard](docs/walkthrough/motion-video-storyboard.md)
+- [Walkthrough Motion Video Script](docs/walkthrough/motion-video-script.md)
 - [Manual Testing](manual-testing/README.md)
 
 ## Stack
@@ -110,15 +111,21 @@ GET /promotions/{id}/release-notes
 
 ## Final Walkthrough
 
-This repository includes a generated motion video for challenge item `04 Walk us through it`.
+This repository includes a generated motion video.
 
-Target output:
+- Video: [`deliverables/walkthrough/releasepilot-walkthrough.mp4`](deliverables/walkthrough/releasepilot-walkthrough.mp4)
+- Script (topic → scene map): [`docs/walkthrough/motion-video-script.md`](docs/walkthrough/motion-video-script.md)
+- Storyboard: [`docs/walkthrough/motion-video-storyboard.md`](docs/walkthrough/motion-video-storyboard.md)
 
-```text
-deliverables/walkthrough/releasepilot-walkthrough.mp4
-```
+It is a ~3:28, 1080p, full-motion piece with a synthetic voiceover and burned-in subtitles that
+covers the problem framing, the Promotion aggregate, the DDD tactical building blocks mapped to
+real classes, its invariants, the state machine, the CQRS split, the transactional outbox and
+async consumers, the hexagonal ports/adapters, the persistence model, the error model, a live
+API request/response, the test pyramid, the trade-offs, and future work.
 
-Regenerate it with:
+The video is generated from repo-owned source — an animated web app in
+`scripts/walkthrough/web` captured frame-by-frame through headless Chromium and encoded with
+ffmpeg. Regenerate it (requires `node`, `npm`, and `ffmpeg`) with:
 
 ```bash
 ./scripts/generate-walkthrough-video.sh

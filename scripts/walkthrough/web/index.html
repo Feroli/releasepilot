@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ReleasePilot Walkthrough</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- Fixed 1920x1080 stage. Everything is drawn as a pure function of window.seek(t). -->
+    <div id="stage">
+      <svg id="scene" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet"></svg>
+
+      <!-- HTML overlays render crisper text than SVG for body copy -->
+      <div id="chrome">
+        <div id="brand">
+          <span class="dot"></span>
+          <span class="brand-name">ReleasePilot</span>
+          <span class="brand-sub">architecture walkthrough</span>
+        </div>
+        <div id="scene-counter"><span id="scene-index">01</span> / <span id="scene-total">17</span></div>
+      </div>
+
+      <div id="subtitle">
+        <div id="subtitle-inner"></div>
+      </div>
+
+      <div id="progress">
+        <div id="progress-fill"></div>
+      </div>
+
+      <div id="flash"></div>
+    </div>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>

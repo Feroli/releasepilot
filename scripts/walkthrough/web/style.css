@@ -1,0 +1,190 @@
+:root {
+  /* Neon Deploy palette */
+  --bg0: #07071a;
+  --bg1: #0d0b2b;
+  --bg2: #120a2e;
+  --ink: #f5f7ff;
+  --muted: #9aa3c7;
+  --faint: #5b6088;
+
+  --cyan: #22d3ee;
+  --blue: #3b82f6;
+  --violet: #8b5cf6;
+  --magenta: #ec4899;
+  --lime: #a3e635;
+  --amber: #fbbf24;
+  --red: #f87171;
+
+  --panel: rgba(20, 18, 48, 0.72);
+  --panel-line: rgba(139, 129, 216, 0.28);
+
+  --mono: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, "SF Pro Display", "Inter", system-ui, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: #000;
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+#stage {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  background:
+    radial-gradient(1200px 900px at 18% 12%, rgba(139, 92, 246, 0.22), transparent 60%),
+    radial-gradient(1100px 900px at 86% 88%, rgba(34, 211, 238, 0.18), transparent 62%),
+    radial-gradient(900px 800px at 78% 8%, rgba(236, 72, 153, 0.12), transparent 60%),
+    linear-gradient(160deg, var(--bg0) 0%, var(--bg1) 55%, var(--bg2) 100%);
+  overflow: hidden;
+}
+
+#scene {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+}
+
+/* ---- persistent chrome ---- */
+#chrome {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#brand {
+  position: absolute;
+  top: 46px;
+  left: 64px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-weight: 600;
+}
+
+#brand .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--cyan) 45%, var(--violet));
+  box-shadow: 0 0 18px rgba(34, 211, 238, 0.9), 0 0 40px rgba(139, 92, 246, 0.6);
+}
+
+#brand .brand-name {
+  font-size: 26px;
+  letter-spacing: 0.2px;
+  color: var(--ink);
+}
+
+#brand .brand-sub {
+  font-size: 15px;
+  color: var(--muted);
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+}
+
+#scene-counter {
+  position: absolute;
+  top: 50px;
+  right: 66px;
+  font-family: var(--mono);
+  font-size: 18px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+#scene-counter #scene-index {
+  color: var(--lime);
+  font-weight: 600;
+}
+
+/* ---- subtitle bar (the narration) ---- */
+#subtitle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 96px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+#subtitle-inner {
+  max-width: 1280px;
+  padding: 18px 34px;
+  border-radius: 18px;
+  background: rgba(7, 6, 22, 0.62);
+  border: 1px solid rgba(139, 129, 216, 0.22);
+  backdrop-filter: blur(8px);
+  text-align: center;
+  font-size: 34px;
+  line-height: 1.32;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: 0.2px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.5);
+}
+
+#subtitle-inner .accent {
+  color: var(--cyan);
+  font-weight: 700;
+}
+#subtitle-inner .accent2 {
+  color: var(--lime);
+  font-weight: 700;
+}
+#subtitle-inner .accent3 {
+  color: var(--magenta);
+  font-weight: 700;
+}
+
+/* ---- progress rail ---- */
+#progress {
+  position: absolute;
+  left: 64px;
+  right: 64px;
+  bottom: 52px;
+  height: 5px;
+  border-radius: 5px;
+  background: rgba(139, 129, 216, 0.16);
+  overflow: hidden;
+}
+
+#progress-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 5px;
+  background: linear-gradient(90deg, var(--cyan), var(--violet) 55%, var(--magenta));
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.8);
+}
+
+/* ---- transition flash / light sweep ---- */
+#flash {
+  position: absolute;
+  inset: -20% -40%;
+  opacity: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(34, 211, 238, 0.0) 42%,
+    rgba(139, 92, 246, 0.55) 50%,
+    rgba(236, 72, 153, 0.0) 58%,
+    transparent 70%
+  );
+  transform: translateX(-60%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
