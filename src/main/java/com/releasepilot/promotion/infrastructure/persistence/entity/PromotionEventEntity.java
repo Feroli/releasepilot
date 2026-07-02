@@ -2,7 +2,6 @@ package com.releasepilot.promotion.infrastructure.persistence.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
@@ -15,7 +14,6 @@ public class PromotionEventEntity {
     private UUID promotionId;
     private String eventType;
     private String actingUser;
-    @Lob
     private String payload;
     private Instant occurredAt;
 
